@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Input validation
-    if (typeof message !== 'string' || message.length > 10000) {
+    // Input validation - increased limit to 150,000 characters
+    if (typeof message !== 'string' || message.length > 150000) {
       return NextResponse.json(
-        { error: 'Bericht moet een string zijn van maximaal 10.000 karakters', success: false },
+        { error: 'Bericht moet een string zijn van maximaal 150.000 karakters', success: false },
         { status: 400 }
       )
     }
