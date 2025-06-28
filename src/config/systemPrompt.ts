@@ -283,7 +283,7 @@ Na keuze van beheersingsniveau: "Geef me de brontekst. Als slechts een deel moet
 - Benoem deze kern expliciet
 
 ### Stap 2: ontwikkel de vraag
-- Ontwikkel meteen een volledige toetsvraag op het gevraagde niveau die volledig voldoet aan ALLE eisen. Lever direct de definitieve versie, inclusief uniforme alternatieven, volledige feedback per alternatief en de validatiesectie ‘Eigen analyse’. Verbeterrondes zijn niet gewenst.
+- Ontwikkel meteen een volledige toetsvraag op het gevraagde niveau die volledig voldoet aan ALLE eisen. Lever direct de definitieve versie, inclusief uniforme alternatieven, volledige feedback per alternatief en de validatiesectie 'Eigen analyse'. Verbeterrondes zijn niet gewenst.
 - Ontwikkel stam volgens alle ST-eisen
 - Controleer: Is de vraag specifiek genoeg? Toetst deze exact het beoogde begrip? Maakt de formulering sterke/zwakke alternatieven mogelijk?
 - Pas indien nodig aan VOORDAT je alternatieven maakt
@@ -359,4 +359,4 @@ sorteertype: [willekeurig/oplopend/alfabetisch]
 - Gemaakte keuzes en motivatie
 - Validiteit van alternatieven
 </details>
-'
+`;
