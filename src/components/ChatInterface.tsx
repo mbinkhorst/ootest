@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { PROMPT_FILE_PATH } from '@/config/prompt'
 
 interface Message {
   id: string
@@ -20,7 +21,7 @@ export default function ChatInterface() {
   useEffect(() => {
     const loadSystemPrompt = async () => {
       try {
-        const response = await fetch('/system-prompt.txt')
+        const response = await fetch(PROMPT_FILE_PATH)
         if (response.ok) {
           const promptText = await response.text()
           setSystemPrompt(promptText)
