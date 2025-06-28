@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextRequest, NextResponse } from 'next/server'
+import { systemPrompt } from '@/config/systemPrompt'
 
 // Initialize Gemini AI client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request data
     const body = await request.json()
-    const { message, systemPrompt } = body
+    const { message, history } = body
 
     if (!message) {
       return NextResponse.json(
@@ -40,12 +41,24 @@ export async function POST(request: NextRequest) {
     // Use Gemini 2.5 Flash for good balance of speed and quality
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
-    // Combine system prompt with user message
-    const fullPrompt = systemPrompt 
-      ? `${systemPrompt}\n\nGebruiker: ${message}\n\nAssistent:`
-      : message
+    // Build conversation context
+    let conversationContext = systemPrompt + '\n\n'
+    
+    // Add conversation history if available
+    if (history && Array.isArray(history)) {
+      history.forEach((msg: any) => {
+        if (msg.role === 'user') {
+          conversationContext += `Gebruiker: ${msg.content}\n`
+        } else if (msg.role === 'assistant') {
+          conversationContext += `Assistent: ${msg.content}\n`
+        }
+      })
+    }
+    
+    // Add current message
+    conversationContext += `Gebruiker: ${message}\nAssistent:`
 
-    const result = await model.generateContent(fullPrompt)
+    const result = await model.generateContent(conversationContext)
     const response = await result.response
     const text = response.text()
 

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { PROMPT_FILE_PATH } from '@/config/prompt'
+import { useState } from 'react'
 
 interface Message {
   id: string
@@ -14,34 +13,9 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [systemPrompt, setSystemPrompt] = useState<string>('')
-  const [promptLoaded, setPromptLoaded] = useState(false)
-
-  // Load system prompt on component mount
-  useEffect(() => {
-    const loadSystemPrompt = async () => {
-      try {
-        const response = await fetch(PROMPT_FILE_PATH)
-        if (response.ok) {
-          const promptText = await response.text()
-          setSystemPrompt(promptText)
-        } else {
-          console.error('Failed to load system prompt')
-          setSystemPrompt('Je bent een behulpzame AI-assistent.')
-        }
-      } catch (error) {
-        console.error('Error loading system prompt:', error)
-        setSystemPrompt('Je bent een behulpzame AI-assistent.')
-      } finally {
-        setPromptLoaded(true)
-      }
-    }
-
-    loadSystemPrompt()
-  }, [])
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading || !promptLoaded) return
+    if (!input.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -62,7 +36,6 @@ export default function ChatInterface() {
         },
         body: JSON.stringify({
           message: input,
-          systemPrompt: systemPrompt,
           history: messages
         }),
       })
@@ -103,18 +76,15 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto">
+    <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
-        <h1 className="text-xl font-semibold text-gray-800">Chat App</h1>
-        {!promptLoaded && (
-          <p className="text-sm text-gray-500">Laden van systeem prompt...</p>
-        )}
+      <div className="bg-blue-500 text-white p-4 rounded-t-lg">
+        <h2 className="text-lg font-semibold">Chat</h2>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && promptLoaded && (
+        {messages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
             <p>Start een gesprek door een bericht te typen!</p>
           </div>
@@ -132,7 +102,7 @@ export default function ChatInterface() {
                   : 'bg-gray-200 text-gray-800'
               }`}
             >
-              <p className="text-sm">{message.content}</p>
+              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               <p className="text-xs opacity-70 mt-1">
                 {message.timestamp.toLocaleTimeString()}
               </p>
@@ -157,20 +127,19 @@ export default function ChatInterface() {
       </div>
 
       {/* Input */}
-      <div className="bg-white border-t border-gray-200 p-4">
+      <div className="border-t border-gray-200 p-4">
         <div className="flex space-x-2">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={promptLoaded ? "Typ je bericht..." : "Wachten op systeem prompt..."}
-            disabled={!promptLoaded}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="Typ je bericht..."
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             rows={2}
           />
           <button
             onClick={sendMessage}
-            disabled={!input.trim() || isLoading || !promptLoaded}
+            disabled={!input.trim() || isLoading}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? '...' : 'Verstuur'}
