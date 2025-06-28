@@ -10,10 +10,12 @@ export async function POST(request: NextRequest) {
     // Check API key
     if (!process.env.GEMINI_API_KEY) {
       console.error('GEMINI_API_KEY not found in environment variables')
+      console.error('Available env vars:', Object.keys(process.env).filter(key => key.includes('GEMINI')))
       return NextResponse.json(
         { 
           error: 'API configuratie ontbreekt. Check Environment Variables.',
-          hint: 'Voeg GEMINI_API_KEY toe aan je environment variables'
+          hint: 'Voeg GEMINI_API_KEY toe aan je environment variables',
+          success: false
         }, 
         { status: 500 }
       )
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!message) {
       return NextResponse.json(
-        { error: 'Bericht is vereist' },
+        { error: 'Bericht is vereist', success: false },
         { status: 400 }
       )
     }
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Input validation
     if (typeof message !== 'string' || message.length > 10000) {
       return NextResponse.json(
-        { error: 'Bericht moet een string zijn van maximaal 10.000 karakters' },
+        { error: 'Bericht moet een string zijn van maximaal 10.000 karakters', success: false },
         { status: 400 }
       )
     }
@@ -72,10 +74,24 @@ export async function POST(request: NextRequest) {
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     
+    // Check if it's an API key related error
+    if (errorMessage.includes('API_KEY') || errorMessage.includes('authentication')) {
+      return NextResponse.json(
+        { 
+          error: 'API sleutel is ongeldig of ontbreekt',
+          details: 'Controleer je GEMINI_API_KEY in .env.local',
+          success: false,
+          timestamp: new Date().toISOString()
+        },
+        { status: 401 }
+      )
+    }
+    
     return NextResponse.json(
       { 
         error: 'Er is een fout opgetreden bij het verwerken van je bericht',
         details: errorMessage,
+        success: false,
         timestamp: new Date().toISOString()
       },
       { status: 500 }
